@@ -8,29 +8,27 @@ import spotipy.util as util
 import config
 from skimage import io
 
-client_id = config.CLIENT_ID
-client_secret = config.CLIENT_SECRET
-
-scope = 'user-library-read'
-
 if len(sys.argv) > 1:
     username = sys.argv[1]
 else: 
     print("Usage %s username" %(sys.argv[0],))
     sys.exit()
 
-auth_manager = SpotifyClientCredentials(client_id=client_id,client_secret=client_secret)
-sp = spotipy.Spotify(auth_manager = auth_manager)
-token = util.prompt_for_user_token(scope,client_id = client_id,client_secret=client_secret,redirect_uri= "http://localhost:8881/")
-sp =spotipy.Spotify(auth=token)
-
-# id_name = {}
-# list_photo = {}
-# for i in sp.current_user_playlists()['items']:
-#     id_name[i['name']] = i['uri'].split(':')[2]
-#     list_photo[i['uri'].split(':')[2]] = i['images'][0]['url']
-
+VISUALIZED_SONG_WIDTH = 15
+VISUALIZED_SONG_HEIGHT_RATIO = 0.625
+VISUALIZED_SONG_COLUMNS = 5
 def get_id_name(x):
+    """
+    Pulls playlist and and playlist images
+
+    Parameters:
+        x (token): token that is used to authenticate request from spotify api
+
+    Returns:
+        Dictionary for playlist with playlist name as key and id as value,
+        Dictionary for playlist image with id as key and url of image as value
+    """
+
     id_name = {}
     list_photo = {}
     for i in x.current_user_playlists()['items']:
@@ -38,7 +36,7 @@ def get_id_name(x):
         list_photo[i['uri'].split(':')[2]] = i['images'][0]['url']
     return id_name,list_photo
 
-def create_necessary_outputs(playlist_name,id_dic,df):
+def create_necessary_outputs(playlist_name,id_dic,df,x):
     """
     Pull songs from a specific playlist
 
@@ -46,7 +44,7 @@ def create_necessary_outputs(playlist_name,id_dic,df):
         playlist_name (str): name of the playlist you'd like to pull from spotify API
         id_dic (dic): dictionary that maps playlist_name to playlist_id
         df (pandas dataframe): spotify dataframe
-    
+        x (token): token that is used to authenticate request from spotify api
     Returns:
         playlist: all songs in the playlist that are available from Kaggle Dataset
     """
@@ -54,7 +52,7 @@ def create_necessary_outputs(playlist_name,id_dic,df):
     playlist = pd.DataFrame()
     playlist_name = playlist_name
 
-    for ind, i in enumerate(sp.playlist(id_dic[playlist_name])['tracks']['items']):
+    for ind, i in enumerate(x.playlist(id_dic[playlist_name])['tracks']['items']):
         playlist.loc[ind,'artist'] = i['track']['artists'][0]['name']
         playlist.loc[ind,'name'] = i['track']['name']
         playlist.loc[ind,'id'] = i['track']['id']
@@ -67,19 +65,29 @@ def create_necessary_outputs(playlist_name,id_dic,df):
     return playlist
 
 def visualize_songs(df):
+    """
+    Visualizes song album imaage
+
+    Parameters:
+        playlist dataframe: dataframe of playlist with features
+
+    Returns:
+        image of album art of each song in dataframe
+    """
+
     temp = df['url'].values
-    plt.figure(figsize=(15,int(0.625*len(temp))))
-    columns = 5
+    plt.figure(figsize=(VISUALIZED_SONG_WIDTH, int(VISUALIZED_SONG_HEIGHT_RATIO* len(temp))))
+    columns = VISUALIZED_SONG_COLUMNS
  
-    for i,url in enumerate(temp):
-        plt.subplot(len(temp)/columns+1,columns,i+1)
+    for i, url in enumerate(temp):
+        plt.subplot(len(temp) / columns + 1,columns,i + 1)
 
         image  = io.imread(url)
         plt.imshow(image)
         plt.xticks(color='w',fontsize = 0.1)
         plt.yticks(color='w',fontsize = 0.1)
-        plt.xlabel(df['name'].values[i],fontsize= 12)
-        plt.tight_layout(h_pad=0.4,w_pad=0)
-        plt.subplots_adjust(wspace=None,hspace=None)
+        plt.xlabel(df['name'].values[i],fontsize = 12)
+        plt.tight_layout(h_pad = 0.4,w_pad = 0)
+        plt.subplots_adjust(wspace = None,hspace = None)
 
     plt.show()

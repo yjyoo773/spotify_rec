@@ -15,7 +15,7 @@ def playlist_vector(complete_feature_set,playlist_df,weight_factor):
     """
 
     complete_feature_set_playlist = complete_feature_set[complete_feature_set['id'].isin(playlist_df['id'].values)]
-    complete_feature_set_playlist = complete_feature_set_playlist.merge(playlist_df[['id','date_added']],on='id',how='inner')
+    complete_feature_set_playlist = complete_feature_set_playlist.merge(playlist_df[['id','date_added']],on = 'id',how = 'inner')
     complete_feature_set_nonplaylist = complete_feature_set[~complete_feature_set['id'].isin(playlist_df['id'].values)]
 
     playlist_feature_set = complete_feature_set_playlist.sort_values('date_added',ascending = False)
@@ -30,5 +30,5 @@ def playlist_vector(complete_feature_set,playlist_df,weight_factor):
     playlist_feature_set_weighted.update(playlist_feature_set_weighted.iloc[:,:-4].mul(playlist_feature_set_weighted.weight,0))
     playlist_feature_set_weighted_final = playlist_feature_set_weighted.iloc[:,:-4]
 
-    return playlist_feature_set_weighted_final.sum(axis=0), complete_feature_set_nonplaylist
+    return playlist_feature_set_weighted_final.sum(axis = 0), complete_feature_set_nonplaylist
 
