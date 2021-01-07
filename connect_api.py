@@ -75,8 +75,8 @@ def visualize_songs(df):
         image of album art of each song in dataframe
     """
 
-    temp = df['url'].values
-    plt.figure(figsize=(VISUALIZED_SONG_WIDTH, int(VISUALIZED_SONG_HEIGHT_RATIO* len(temp))))
+    urls = df['url'].values
+    plt.figure(figsize=(VISUALIZED_SONG_WIDTH, int(VISUALIZED_SONG_HEIGHT_RATIO* len(urls))))
     columns = VISUALIZED_SONG_COLUMNS
  
     for i, url in enumerate(temp):
