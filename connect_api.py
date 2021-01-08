@@ -36,7 +36,7 @@ def get_id_name(x):
         list_photo[i['uri'].split(':')[2]] = i['images'][0]['url']
     return id_name,list_photo
 
-def create_necessary_outputs(playlist_name,id_dic,df,x):
+def create_necessary_outputs(playlist_name,id_dic,df,token):
     """
     Pull songs from a specific playlist
 
@@ -44,7 +44,7 @@ def create_necessary_outputs(playlist_name,id_dic,df,x):
         playlist_name (str): name of the playlist you'd like to pull from spotify API
         id_dic (dic): dictionary that maps playlist_name to playlist_id
         df (pandas dataframe): spotify dataframe
-        x (token): token that is used to authenticate request from spotify api
+        token (token): token that is used to authenticate request from spotify api
     Returns:
         playlist: all songs in the playlist that are available from Kaggle Dataset
     """
@@ -52,7 +52,7 @@ def create_necessary_outputs(playlist_name,id_dic,df,x):
     playlist = pd.DataFrame()
     playlist_name = playlist_name
 
-    for ind, i in enumerate(x.playlist(id_dic[playlist_name])['tracks']['items']):
+    for ind, i in enumerate(token.playlist(id_dic[playlist_name])['tracks']['items']):
         playlist.loc[ind,'artist'] = i['track']['artists'][0]['name']
         playlist.loc[ind,'name'] = i['track']['name']
         playlist.loc[ind,'id'] = i['track']['id']
@@ -79,8 +79,8 @@ def visualize_songs(df):
     plt.figure(figsize=(VISUALIZED_SONG_WIDTH, int(VISUALIZED_SONG_HEIGHT_RATIO* len(urls))))
     columns = VISUALIZED_SONG_COLUMNS
  
-    for i, url in enumerate(temp):
-        plt.subplot(len(temp) / columns + 1,columns,i + 1)
+    for i, url in enumerate(urls):
+        plt.subplot(len(urls) / columns + 1,columns,i + 1)
 
         image  = io.imread(url)
         plt.imshow(image)
