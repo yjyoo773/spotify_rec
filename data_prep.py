@@ -3,9 +3,6 @@ import numpy as np
 import re
 import itertools
 
-spotify_df = pd.read_csv("data.csv")
-data_w_genre = pd.read_csv("data_w_genres.csv")
-POPULARITY_SPLITS = 5
 def normalize_genre(genre_df):
     """
     Normalize text for genres in genre dataframe
@@ -16,7 +13,7 @@ def normalize_genre(genre_df):
     Returns:
         panda dataframe with new normalized column named 'genres_upd'
     """
-    data_w_genre['genres_upd'] = data_w_genre['genres'].\
+    genre_df['genres_upd'] = genre_df['genres'].\
         apply(lambda x:[re.sub(" ","_",i) for i in re.findall(r"'([^']*)'",x)])
     return genre_df
 
@@ -80,7 +77,7 @@ def combine_dataframes(spotify_df,genre_df):
 
     return spotify_df
 
-def split_pop_year(spotify_df):
+def split_pop_year(spotify_df, pop_split):
     """
     Creates two columns for spotify dataframe, year column and popularity column which is divided into buckets.
     Also replaces null values into empty lists
@@ -95,14 +92,14 @@ def split_pop_year(spotify_df):
     spotify_df['year'] = spotify_df['release_date'].apply(lambda x: x.split('-')[0])
 
     # Divide popularity column into a number of parts
-    spotify_df['pop_red'] = spotify_df['popularity'].apply(lambda x: int(x/POPULARITY_SPLITS))
+    spotify_df['pop_red'] = spotify_df['popularity'].apply(lambda x: int(x/pop_split))
 
     # Replace null values with empty list
     spotify_df['consolidate_genre_lists'] = spotify_df['consolidate_genre_lists'].apply(lambda x: x if isinstance(x,list) else [])
 
     return spotify_df
 
-def data_prep(spotify_df,genre_df):
+def data_prep(spotify_df,genre_df,pop_split):
     """
     Executes normalize_genre, normalize_artists, song_artitst_identifier, combine_dataframes, split_pop_year
     functions
@@ -114,7 +111,10 @@ def data_prep(spotify_df,genre_df):
         finalized spotify_df
     """
     genre_df = normalize_genre(genre_df)
-    spotify_df = combine_dataframes(song_artist_identifier(normalize_artists(spotify_df)),genre_df)
-    return split_pop_year(spotify_df)
+    spotify_df = normalize_artists(spotify_df)
+    spotify_df = song_artist_identifier(spotify_df)
+    spotify_df = combine_dataframes(spotify_df,genre_df)
+    # spotify_df = combine_dataframes(song_artist_identifier(normalize_artists(spotify_df)),genre_df)
+    return split_pop_year(spotify_df,pop_split)
 
-spotify_df = data_prep(spotify_df,data_w_genre)
+# spotify_df = data_prep(spotify_df,data_w_genre,5)
