@@ -78,6 +78,7 @@ def combine_dataframes(spotify_df,genre_df):
     return spotify_df
 
 def split_pop_year(spotify_df, pop_split):
+
     """
     Creates two columns for spotify dataframe, year column and popularity column which is divided into buckets.
     Also replaces null values into empty lists
@@ -114,7 +115,5 @@ def data_prep(spotify_df,genre_df,pop_split):
     spotify_df = normalize_artists(spotify_df)
     spotify_df = song_artist_identifier(spotify_df)
     spotify_df = combine_dataframes(spotify_df,genre_df)
-    # spotify_df = combine_dataframes(song_artist_identifier(normalize_artists(spotify_df)),genre_df)
     return split_pop_year(spotify_df,pop_split)
 
-# spotify_df = data_prep(spotify_df,data_w_genre,5)

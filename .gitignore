@@ -1,6 +1,10 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 config.py
 __pycache__/config.cpython-38.pyc
 .ipynb_checkpoints/spotify_rec-checkpoint.ipynb
 __pycache__/token.cpython-38.pyc
 .cache-user-library-read
-__pycache__
+
